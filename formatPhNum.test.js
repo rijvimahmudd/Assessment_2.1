@@ -6,8 +6,6 @@ describe('formatPhoneNumber', () => {
       expect(formatPhoneNumber(phoneInput)).toBe('(222) 348-0032');
     });
   
-    // Other test cases...
-  
     it('should update the input value with the formatted number', () => {
       const phoneInput = '1234567890';
       expect(formatPhoneNumber(phoneInput)).toBe('(123) 456-7890');

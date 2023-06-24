@@ -4,6 +4,7 @@ function formatPhoneNumber(value) {
   
     // Format the phone number
     let formattedNumber = '';
+    
     for (let i = 0; i < inputValue.length; i++) {
       // Add opening parenthesis after the third digit
       if (i === 3) {
