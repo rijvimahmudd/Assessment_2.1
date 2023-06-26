@@ -1,37 +1,68 @@
-import { handleInput } from "./handleInput";
+import handleInput from "./handleInput";
 import formatPhoneNumber from "./formatPhNum";
 
-jest.mock("./formatPhNum", () => jest.fn());
+jest.mock("./formatPhNum");
 
 describe("handleInput", () => {
-  let inputElement;
+  let element;
 
   beforeEach(() => {
-    inputElement = document.createElement("input");
-    formatPhoneNumber.mockClear();
+    // Create a dummy input element
+    element = document.createElement("input");
+    element.value = "";
+    element.selectionStart = 0;
+    element.setSelectionRange = jest.fn();
+    handleInput(element);
   });
 
-  test("should format phone number when input value changes", () => {
-    const phoneNumber = "1234567890";
-    formatPhoneNumber.mockReturnValue("123-456-7890");
-    handleInput(inputElement);
-
-    inputElement.value = phoneNumber;
-    inputElement.dispatchEvent(new Event("input"));
-
-    expect(formatPhoneNumber).toHaveBeenCalledWith(phoneNumber);
-    expect(inputElement.value).toBe("123-456-7890");
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  test("should update input value when formatting fails", () => {
-    const phoneNumber = "1234567890";
-    formatPhoneNumber.mockReturnValue(null);
-    handleInput(inputElement);
+  it("should set the formatted value when input event is triggered", () => {
+    const value = "1234567890";
+    const formattedValue = "(123) 456-7890";
+    formatPhoneNumber.mockReturnValue(formattedValue);
 
-    inputElement.value = phoneNumber;
-    inputElement.dispatchEvent(new Event("input"));
+    element.value = value;
+    element.dispatchEvent(new Event("input"));
 
-    expect(formatPhoneNumber).toHaveBeenCalledWith(phoneNumber);
-    expect(inputElement.value).toBe("");
+    expect(element.value).toBe(formattedValue);
+  });
+
+  it("should set the caret position correctly", () => {
+    const value = "1234567890";
+    const formattedValue = "(123) 456-7890";
+    formatPhoneNumber.mockReturnValue(formattedValue);
+    const caretPosition = 14;
+
+    element.value = value;
+    element.dispatchEvent(new Event("input"));
+
+    expect(element.setSelectionRange).toHaveBeenCalledWith(caretPosition, caretPosition);
+  });
+
+  it("should handle the caret position correctly when value length is less than or equal to 3", () => {
+    const value = "123";
+    const formattedValue = "123";
+    formatPhoneNumber.mockReturnValue(formattedValue);
+    const caretPosition = 3;
+
+    element.value = value;
+    element.dispatchEvent(new Event("input"));
+
+    expect(element.setSelectionRange).toHaveBeenCalledWith(caretPosition, caretPosition);
+  });
+
+  it("should handle the caret position correctly when value length is greater than 3", () => {
+    const value = "123456";
+    const formattedValue = "(123) 456";
+    formatPhoneNumber.mockReturnValue(formattedValue);
+    const caretPosition = 9;
+
+    element.value = value;
+    element.dispatchEvent(new Event("input"));
+
+    expect(element.setSelectionRange).toHaveBeenCalledWith(caretPosition, caretPosition);
   });
 });

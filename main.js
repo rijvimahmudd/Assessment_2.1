@@ -1,4 +1,4 @@
-import { handleInput } from './handleInput'
+import handleInput from './handleInput'
 import './style.css'
 
 document.querySelector('#app').innerHTML = `
